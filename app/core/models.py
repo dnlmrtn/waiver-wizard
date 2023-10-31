@@ -15,17 +15,12 @@ class Players(models.Model):
         max_length=10, choices=PLAYER_STATUS_CHOICES, default='active')
     percent_owned = models.DecimalField(max_digits=5, decimal_places=2)
 
-    minutes_per_game = models.DecimalField(max_digits=5, decimal_places=2)
-
     points_per_game = models.DecimalField(max_digits=5, decimal_places=2)
     assists_per_game = models.DecimalField(max_digits=5, decimal_places=2)
     rebounds_per_game = models.DecimalField(max_digits=5, decimal_places=2)
     steals_per_game = models.DecimalField(max_digits=5, decimal_places=2)
     blocks_per_game = models.DecimalField(max_digits=5, decimal_places=2)
-    threes_per_game = models.DecimalField(max_digits=5, decimal_places=2)
-    fg = models.DecimalField(max_digits=5, decimal_places=2)
-    ft = models.DecimalField(max_digits=5, decimal_places=2)
-    #to_per_game = models.DecimalField(max_digits=5, decimal_places=2)
+    to_per_game = models.DecimalField(max_digits=5, decimal_places=2)
 
     def __str__(self):
         return self.name
