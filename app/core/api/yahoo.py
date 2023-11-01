@@ -1,31 +1,24 @@
-from yahoo_oauth import OAuth2
 import yahoo_fantasy_api as yfa
 
-YEAR = '2023'
-
-file_path = '/app/core/api/token.json'
+YEAR = 2023
 
 
 class YahooFantasyAPIService:
-    def __init__(self):
-        sc = OAuth2(None, None, from_file=file_path)
+    def __init__(self, sc, league_id):
         self.gm = yfa.Game(sc, 'nba')
-        
+        self.lg = self.gm.to_league(league_id)
 
-    def get_leagues(self):
-        leagues = self.gm.league_ids(YEAR)
-        return leagues
+    def get_all_players(self) -> list:
+        return self.lg.free_agents("Util") + self.lg.taken_players()
+    
+    def get_player_details(self, player_ids) -> list:
+        return self.lg.player_details(player_ids)
 
-    def to_league(self, league_id):
-        return self.gm.to_league(league_id)
-
-    def get_free_agents(self, league_id):
-        pass
-
-    def get_all_players(self, league_id):
-        lg = self.gm.to_league(league_id=league_id)
-        return lg.free_agents("Util") + lg.taken_players()
-
-    def get_player_stats(self, league_id, player_ids):
-        lg = self.gm.to_league(league_id=league_id)
-        return lg.player_stats(player_ids, 'average_season', season=YEAR)
+    def get_player_stats_last_month(self, player_ids) -> list:
+        return self.lg.player_stats(player_ids, 'lastmonth', season=YEAR)
+    
+    def get_player_stats_season(self, player_ids) -> list:
+        return self.lg.player_stats(player_ids, 'average_season', season=YEAR)
+    
+    def percent_owned(self, player_ids) -> list:
+        return self.lg.percent_owned(player_ids)
