@@ -28,14 +28,14 @@ class Migration(migrations.Migration):
                 ('name', models.CharField(max_length=100)),
                 ('team', models.CharField(max_length=50)),
                 ('positions', models.CharField(max_length=50)),
-                ('status', models.CharField(choices=[('active', 'A'), ('out', 'O'), ('injured', 'INJ')], default='active', max_length=10)),
-                ('percent_owned', models.DecimalField(decimal_places=2, max_digits=5)),
+                ('status', models.CharField(choices=[('gtd', 'GTD'), ('out', 'O'), ('injured', 'INJ'), ('healthy', 'H')], default='active', max_length=10)),
                 ('points_per_game', models.DecimalField(decimal_places=2, max_digits=5)),
                 ('assists_per_game', models.DecimalField(decimal_places=2, max_digits=5)),
                 ('rebounds_per_game', models.DecimalField(decimal_places=2, max_digits=5)),
                 ('steals_per_game', models.DecimalField(decimal_places=2, max_digits=5)),
                 ('blocks_per_game', models.DecimalField(decimal_places=2, max_digits=5)),
                 ('to_per_game', models.DecimalField(decimal_places=2, max_digits=5)),
+                ('fan_pts', models.DecimalField(max_digits=5, decimal_places=2))
             ],
         ),
     ]

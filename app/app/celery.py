@@ -30,6 +30,6 @@ logger = get_task_logger(__name__)
 app.conf.beat_schedule = {
     'update_player_status_every_minute': {
         'task': 'core.tasks.update_players',
-        'schedule': crontab(minute='*/5'),
+        'schedule': crontab(hour='16'),
     },
 }

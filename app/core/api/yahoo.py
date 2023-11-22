@@ -20,5 +20,8 @@ class YahooFantasyAPIService:
     def get_player_stats_season(self, player_ids) -> list:
         return self.lg.player_stats(player_ids, 'average_season', season=YEAR)
     
-    def percent_owned(self, player_ids) -> list:
+    def get_percent_owned(self, player_ids) -> list:
         return self.lg.percent_owned(player_ids)
+    
+    def details(self):
+        return self.lg.player_details("LeBron James")

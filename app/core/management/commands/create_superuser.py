@@ -1,17 +1,19 @@
 import os
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
+from django.core.management.base import BaseCommand
 
-def create_superuser():
-    username = os.environ.get("DJANGO_SUPERUSER_USERNAME")
-    email = os.environ.get("DJANGO_SUPERUSER_EMAIL")
-    password = os.environ.get("DJANGO_SUPERUSER_PASSWORD")
-    
-    # Check if the user already exists
-    if User.objects.filter(username=username).exists():
-        print("Superuser already exists.")
-        return
-    User.objects.create_superuser(username=username, email=email, password=password)
-    print(f"Superuser {username} created.")
+class Command(BaseCommand):
+    help = "Creates an admin user non-interactively if it doesn't exist"
 
-# Run the function to create a superuser
-create_superuser()
+    def handle(self, *args, **options):
+        User = get_user_model()
+
+        username = os.environ.get("DJANGO_SUPERUSER_USERNAME")
+        email = os.environ.get("DJANGO_SUPERUSER_EMAIL")
+        password = os.environ.get("DJANGO_SUPERUSER_PASSWORD")
+
+        if not User.objects.filter(username=username).exists():
+            User.objects.create_superuser(username=username,
+                                          email=email,
+                                          password=password)
+

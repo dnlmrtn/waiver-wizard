@@ -1,3 +1,4 @@
-env
+.env
 docker-compose.yml
 Dockerfile
+core/api/token.json
