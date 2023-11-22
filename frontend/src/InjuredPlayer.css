@@ -1,0 +1,30 @@
+.player-bubble {
+  display: inline-block;
+  margin: 10px;
+  position: relative; /* Add this to make positioning relative to the parent */
+}
+
+button {
+  border: 1px solid #000;
+  border-radius: 10px;
+  padding: 10px;
+  cursor: pointer;
+  background-color: #282c34;
+}
+
+.popups {
+  position: absolute;
+  top: 0;
+  left: 100%; /* Position to the right of the button */
+  display: flex;
+  flex-direction: column; /* Stack popups vertically */
+  margin-top: 5px;
+}
+
+.popup {
+  background-color: #fff;
+  border: 1px solid #000;
+  border-radius: 5px;
+  padding: 10px;
+  margin-top: 5px;
+}
