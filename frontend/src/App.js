@@ -20,15 +20,21 @@ function App() {
   return (
     <div className="App">
       <header className="App-header">
-        <p>Injured Players:</p>
-        <ul>
+        <p>Welcome to Waiver Wizard!</p>
+        <p className='subtitle'>See the list of siginificant fantasy players who are not playing tonight, and click on them to see players with role increases :)</p>
+      
+        <ul >
           {Object.entries(playersData).map(([player, otherPlayers]) => (
+            <li>
             <InjuredPlayer key={player} playerName={player} otherPlayers={otherPlayers}>
               {player}:
             </InjuredPlayer>
+            </li>
           ))}
         </ul>
-      </header>
+        </header>
+        <p className='subtitle'>Player stats are updated every 10 minutes between 5:30pm to 10pm EST, and every morning at 7am.</p>
+
     </div>
   );
 }

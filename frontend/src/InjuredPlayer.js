@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import "./InjuredPlayer.css"
 
 const InjuredPlayer = ({ playerName, otherPlayers, onClick }) => {
   const [showPopups, setShowPopups] = useState(false);
@@ -10,7 +11,7 @@ const InjuredPlayer = ({ playerName, otherPlayers, onClick }) => {
 
   return (
     <div className="player-bubble">
-      <button onClick={handleClick}>{playerName}</button>
+      <div className='injured-button' onClick={handleClick}>{playerName}</div>
       {showPopups && (
         <div className="popups">
           {otherPlayers.map((otherPlayer, index) => (
