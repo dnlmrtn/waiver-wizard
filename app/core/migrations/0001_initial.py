@@ -21,7 +21,7 @@ class Migration(migrations.Migration):
             ],
         ),
         migrations.CreateModel(
-            name='Players',
+            name='Player',
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('yahoo_id', models.CharField(max_length=6)),
@@ -29,6 +29,7 @@ class Migration(migrations.Migration):
                 ('team', models.CharField(max_length=50)),
                 ('positions', models.CharField(max_length=50)),
                 ('status', models.CharField(choices=[('gtd', 'GTD'), ('out', 'O'), ('injured', 'INJ'), ('healthy', 'H')], default='active', max_length=10)),
+                ('time_of_last_update', models.DateTimeField(auto_now=True)),
                 ('points_per_game', models.DecimalField(decimal_places=2, max_digits=5)),
                 ('assists_per_game', models.DecimalField(decimal_places=2, max_digits=5)),
                 ('rebounds_per_game', models.DecimalField(decimal_places=2, max_digits=5)),
