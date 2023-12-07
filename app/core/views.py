@@ -32,12 +32,12 @@ def injuries(request):
     return HttpResponse(injured)
 
 def benefitting(request):
-    injured = Player.objects.filter((Q(status='INJ') | Q(status='O')) & Q(fan_pts__gte=28)).order_by("-fan_pts")
+    injured = Player.objects.filter((Q(status='INJ') | Q(status='O')) & Q(fan_pts__gte=28)).order_by("time_of_last_update", "-fan_pts")
     players_to_benefitting_players = {}
     players_to_time_of_injury = {}
     for player in injured:
         positions = player.positions.split(",")
-        same_team_and_fantasy_points_query = Q(team=player.team) & Q(fan_pts__lt=25)
+        same_team_and_fantasy_points_query = Q(team=player.team) & Q(fan_pts__lt=26)
 
         overlapping_positions_query = Q()
         for position in positions:
@@ -47,7 +47,7 @@ def benefitting(request):
             same_team_and_fantasy_points_query & overlapping_positions_query
         ).exclude(
             id=player.id
-        ).values_list('name', flat=True).order_by("time_of_last_update", "-fan_pts")[0:2]
+        ).values_list('name', flat=True).order_by("-fan_pts")[0:3]
 
         players_to_benefitting_players[player.name] = list(benefiting_players)
         players_to_time_of_injury[player.name] = player.time_of_last_update

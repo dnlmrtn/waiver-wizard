@@ -23,12 +23,10 @@ logger = get_task_logger(__name__)
 app.conf.beat_schedule = {
     'update_player_stats_weekly': {
         'task': 'core.tasks.update_player_stats',
-        'schedule': crontab(
-            
-            minute='45'),
+        'schedule': crontab(minute='27')
     },
     'update_player_status': {
-        'task': 'core.tasks.update_player_stats',
-        'schedule': crontab(minute='*/15', hour='16-20'),
+        'task': 'core.tasks.update_player_status',
+        'schedule': crontab(minute='*/5'),
     },
 }

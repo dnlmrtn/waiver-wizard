@@ -12,6 +12,9 @@ import os
 
 LEAGUE_ID = os.getenv('LEAGUE_ID')
 
+def get_stat_or_zero(stat):
+    return 0 if stat == '-' else stat
+
 @shared_task
 def update_player_stats():
     sc = OAuth2(None, None, from_file='core/api/token.json')
@@ -26,36 +29,35 @@ def update_player_stats():
     stats_by_player_id = {stat['player_id']: stat for stat in player_stats_season}
     details_by_player_id = {detail['player_id']: detail for detail in player_details}
 
-    player_data = []
+
     for player in all_players:
+        print(player['name'])
         player_id = player['player_id']
         stats = stats_by_player_id.get(player_id, {})
         details = details_by_player_id.get(str(player_id), {})
 
-        if '-' in [stats.get('PTS', 0), stats.get('AST', 0), stats.get('REB', 0), stats.get('ST', 0), stats.get('BLK', 0), stats.get('TO', 0)]:
-            continue
+        pts = get_stat_or_zero(stats.get('PTS', 0))
+        ast = get_stat_or_zero(stats.get('AST', 0))
+        reb = get_stat_or_zero(stats.get('REB', 0))
+        st = get_stat_or_zero(stats.get('ST', 0))
+        blk = get_stat_or_zero(stats.get('BLK', 0))
+        to = get_stat_or_zero(stats.get('TO', 0))
 
-        points = stats.get('PTS', 0)
-        assists = stats.get('AST', 0)
-        rebounds = stats.get('REB', 0)
-        steals = stats.get('STL', 0)
-        blocks = stats.get('BLK', 0)
-        turnovers = stats.get('TO', 0)
-        fan_pts = points +  1.2*rebounds + 1.5*assists + 3*steals + 3* blocks - 1.5*turnovers
+        fan_pts = pts +  1.2*reb + 1.5*ast + 3*st + 3*blk - 1.5*to
         
         player_model, created = Player.objects.update_or_create(
             yahoo_id=player_id,
             defaults={
                 'name': player['name'],
                 'team': details['editorial_team_abbr'],
-                'positions': ','.join(player['eligible_positions']).strip(",Util"),
+                'positions': ", ".join([p for p in player["eligible_positions"] if p not in ["G", "F", "IL+", "IL", "Util"]]),
                 'status': 'H' if not player.get('status') else player['status'],
-                'points_per_game': points,
-                'assists_per_game': assists,
-                'rebounds_per_game': rebounds,
-                'steals_per_game': steals,
-                'blocks_per_game': blocks,
-                'to_per_game': turnovers,
+                'points_per_game': pts,
+                'assists_per_game': ast,
+                'rebounds_per_game': reb,
+                'steals_per_game': st,
+                'blocks_per_game': blk,
+                'to_per_game': to,
                 'fan_pts':fan_pts
             }
         )
@@ -73,7 +75,7 @@ def update_player_status():
         
         player_model, created = Player.objects.update_or_create(
             yahoo_id=player_id,
-            defaults={
-                'status': 'H' if not player.get('status') else player['status'],
-            }
         )
+
+        player_model.status = 'H' if not player.get('status') else player['status']
+        player_model.save()
