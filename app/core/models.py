@@ -10,6 +10,7 @@ class Player(models.Model):
     ]
     yahoo_id = models.CharField(max_length=6)
     name = models.CharField(max_length=100)
+    photo_url = models.CharField(max_length=500)
     team = models.CharField(max_length=50)
     positions = models.CharField(max_length=50)
     status = models.CharField(
