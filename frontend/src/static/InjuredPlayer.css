@@ -1,0 +1,56 @@
+.table-header,
+.table-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px;
+  border-bottom: 1px solid #ddd;
+  align-items: center;
+  /* Add this line */
+}
+
+.header-item,
+.row-item {
+  flex: 1;
+  text-align: center;
+  display: flex;
+  /* Add this line */
+  align-items: center;
+  /* Add this line */
+  justify-content: center;
+  /* Add this line */
+}
+
+.benefiting-players {
+  background-color: #f9f9f9;
+}
+
+.benefiting-player-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 5px;
+  align-items: center;
+  /* Add this line */
+}
+
+.benefiting-player-item {
+  flex: 1;
+  text-align: center;
+  display: flex;
+  /* Add this line */
+  align-items: center;
+  /* Add this line */
+  justify-content: center;
+  /* Add this line */
+}
+
+.row-item img {
+  max-height: 50px;
+  max-width: 50px;
+  align-self: center;
+  /* Add this line */
+}
+
+.status {
+  font-weight: bold;
+  color: red;
+}

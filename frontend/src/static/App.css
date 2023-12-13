@@ -1,0 +1,40 @@
+.App {
+  text-align: left;
+}
+
+.App-header {
+  background-color: #ffffff;
+  display: flexbox;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding-left: 16px;
+
+}
+
+.heading {
+  color: "#191919";
+  font-size: calc(10px + 2vmin);
+  text-align: left;
+  color: '#222222'
+}
+
+.subtitle {
+  font-size: 16px;
+  color: #191919;
+}
+
+ul {
+  padding: 0px;
+}
+
+nav {
+  display: flex;
+  align-items: left;
+  width: 100%;
+  margin: 0px auto;
+  height: 40px;
+
+  border-bottom: 2px solid var(--text-color);
+  background-color: var(--background-color);
+}
