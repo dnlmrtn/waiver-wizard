@@ -30,11 +30,46 @@ ul {
 
 nav {
   display: flex;
-  align-items: left;
+  flex-direction: column;
+  align-items: center;
+
   width: 100%;
   margin: 0px auto;
   height: 40px;
 
-  border-bottom: 2px solid var(--text-color);
+  border-bottom: 2px solid #191919;
   background-color: var(--background-color);
+}
+
+.link-button {
+  display: flexbox;
+  flex-direction: column;
+  align-items: center;
+
+  color: inherit;
+  font-size: inherit;
+  background-color: transparent;
+  cursor: pointer;
+  width: 100%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  text-decoration: none;
+  border: none;
+}
+
+.menus {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: auto;
+  margin: 0px auto;
+  padding: 0px 0px;
+  gap: 80px;
+  font-family: Neue Montreal;
+  list-style: none;
+}
+
+.menu-items {
+  position: relative;
+  font-size: 14px;
 }

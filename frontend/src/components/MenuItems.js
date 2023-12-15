@@ -1,5 +1,7 @@
 import { Link } from 'react-router-dom';
 
+import "../static/App.css"
+
 const MenuItems = ({ items, depthLevel }) => {
     const isExternalLink = items.url.startsWith('http') || items.url.startsWith('https');
 
