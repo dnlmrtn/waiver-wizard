@@ -51,3 +51,8 @@ class Games(models.Model):
 
     def __str__(self):
         return f"{self.home_team} vs {self.away_team} on {self.date}"
+
+class PlayerInjuries(models.Model):
+    page = models.CharField(max_length=50)
+    data = models.JSONField()
+
