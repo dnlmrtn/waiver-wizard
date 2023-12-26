@@ -3,12 +3,15 @@ from celery import shared_task, Celery, task
 from datetime import datetime
 from celery.signals import worker_ready
 
+from django.db.models import Q
+
 from core.api.yahoo import YahooFantasyAPIService
 from yahoo_oauth import OAuth2
 
 from .models import Player, Endpoint
 
 import os
+import json
 
 LEAGUE_ID = os.getenv('LEAGUE_ID')
 
@@ -36,12 +39,10 @@ def update_player_stats():
         : detail for detail in player_details}
 
     for player in all_players:
-        # print(player['name'])
 
         player_id = player['player_id']
         stats = stats_by_player_id.get(player_id, {})
         details = details_by_player_id.get(str(player_id), {})
-        # print(details['image_url'])
         pts = get_stat_or_zero(stats.get('PTS', 0))
         ast = get_stat_or_zero(stats.get('AST', 0))
         reb = get_stat_or_zero(stats.get('REB', 0))
@@ -68,6 +69,9 @@ def update_player_stats():
                 'fan_pts': fan_pts
             }
         )
+    
+    # Update the Players endpoin
+    update_endpoint()
 
 
 @shared_task
@@ -89,11 +93,11 @@ def update_player_status():
             'status') else player['status']
         player_model.save()
 
-@shared_task
+
 def update_endpoint():
+    print("updating endpoint")
     # Clear all existing endpoint objects
-    Endpoint.objects.all.delete()
-    
+    Endpoint.objects.all().delete()
 
     # Update players endpoint
     injured = Player.objects.filter((Q(status='INJ') | Q(status='O')) & Q(
@@ -104,34 +108,49 @@ def update_endpoint():
 
         positions = player.positions.split(",")
         same_team_and_fantasy_points_query = Q(team=player.team) & Q(
-                fan_pts__lt=player.fan_pts) & Q(fan_pts__lt=35) & Q(status='H')
+            fan_pts__lt=player.fan_pts) & Q(fan_pts__lt=35) & Q(status='H')
 
         overlapping_positions_query = Q()
         for position in positions:
             overlapping_positions_query |= Q(positions__contains=position)
 
         benefiting_players = Player.objects.filter(
-                same_team_and_fantasy_points_query & overlapping_positions_query
-                ).exclude(
-                        id=player.id
-                        ).order_by("-fan_pts")[0:7]
+            same_team_and_fantasy_points_query & overlapping_positions_query
+        ).exclude(
+            id=player.id
+        ).order_by("-fan_pts")[0:7]
 
-        benefiting_players_with_stats = {benefitting_player.name: [benefitting_player.points_per_game, benefitting_player.rebounds_per_game, benefitting_player.assists_per_game,
-                                                                   benefitting_player.steals_per_game, benefitting_player.blocks_per_game, benefitting_player.to_per_game] for benefitting_player in benefiting_players}
+        benefiting_players_with_stats = {
+            benefiting_player.name: [
+                float(benefiting_player.points_per_game),
+                float(benefiting_player.rebounds_per_game),
+                float(benefiting_player.assists_per_game),
+                float(benefiting_player.steals_per_game),
+                float(benefiting_player.blocks_per_game),
+                float(benefiting_player.to_per_game)
+            ] for benefiting_player in benefiting_players
+        }
 
-        injured_players[player.name] = {'photo_url': player.photo_url,
-                                        'stats': [player.points_per_game, player.rebounds_per_game, player.assists_per_game,
-                                                  player.steals_per_game, player.blocks_per_game, player.to_per_game],
-                                        'benefiting_players': benefiting_players_with_stats,
-                                        'time_of_injury': player.time_of_last_update,
-                                        'status': player.status, }
+        injured_players[player.name] = {
+            'photo_url': player.photo_url,
+            'stats': [
+                float(player.points_per_game),
+                float(player.rebounds_per_game),
+                float(player.assists_per_game),
+                float(player.steals_per_game),
+                float(player.blocks_per_game),
+                float(player.to_per_game)
+            ],
+            'benefiting_players': benefiting_players_with_stats,
+            'time_of_injury': player.time_of_last_update.isoformat(),  # Convert datetime to ISO 8601 string
+            'status': player.status,
+        }
 
-    Endpoint.objects.create(page="players", data=json.dump(injured_players))
+    Endpoint.objects.create(
+        page="players", data=json.dumps(injured_players))
 
-    # Update teams endpoint
 
 @worker_ready.connect
 def at_start(sender, **kwargs):
     with sender.app.connection() as conn:
         sender.app.send_task('core.tasks.update_player_stats')
-

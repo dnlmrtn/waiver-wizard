@@ -1,6 +1,7 @@
 from django.db import models
 from django.utils import timezone
 
+
 class Player(models.Model):
     PLAYER_STATUS_CHOICES = [
         ('gtd', 'GTD'),
@@ -16,21 +17,21 @@ class Player(models.Model):
     status = models.CharField(
         max_length=10, choices=PLAYER_STATUS_CHOICES, default='active')
     time_of_last_update = models.DateTimeField(auto_now=True)
-    
-    points_per_game = models.DecimalField(max_digits=5, decimal_places=2)
-    assists_per_game = models.DecimalField(max_digits=5, decimal_places=2)
-    rebounds_per_game = models.DecimalField(max_digits=5, decimal_places=2)
-    steals_per_game = models.DecimalField(max_digits=5, decimal_places=2)
-    blocks_per_game = models.DecimalField(max_digits=5, decimal_places=2)
-    to_per_game = models.DecimalField(max_digits=5, decimal_places=2)
 
-    fan_pts = models.DecimalField(max_digits=5, decimal_places=2)
+    points_per_game = models.FloatField()
+    assists_per_game = models.FloatField()
+    rebounds_per_game = models.FloatField()
+    steals_per_game = models.FloatField()
+    blocks_per_game = models.FloatField()
+    to_per_game = models.FloatField()
+
+    fan_pts = models.FloatField()
 
     def __str__(self):
         return self.name
 
     # Modified save method. This ensures time_of_last_update be changed on 'status' update only.
-    # We do not want time_of_last_update changing when the player stats are updated weekly. 
+    # We do not want time_of_last_update changing when the player stats are updated weekly.
     def save(self, *args, **kwargs):
         if self.pk is not None:
             # Fetch the existing record from the database
@@ -44,6 +45,7 @@ class Player(models.Model):
 
         super(Player, self).save(*args, **kwargs)
 
+
 class Games(models.Model):
     date = models.DateTimeField()
     home_team = models.CharField(max_length=50)
@@ -52,7 +54,8 @@ class Games(models.Model):
     def __str__(self):
         return f"{self.home_team} vs {self.away_team} on {self.date}"
 
-class PlayerInjuries(models.Model):
+
+class Endpoint(models.Model):
     page = models.CharField(max_length=50)
     data = models.JSONField()
 
