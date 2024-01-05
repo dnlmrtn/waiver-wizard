@@ -17,15 +17,6 @@ YEAR = '2023'
 file_path = '/app/core/api/token.json'
 
 
-def home(request):
-    data = Player.objects.all().order_by("points_per_game")
-    values = []
-    for player in data:
-        values.append(player.name)
-
-    return HttpResponse(values)
-
-
 def injuries(request):
 
     injured = Player.objects.filter((Q(status='INJ') | Q(

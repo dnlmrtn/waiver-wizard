@@ -33,10 +33,8 @@ def update_player_stats():
         [player["player_id"] for player in all_players])
 
     # Mapping stats by player_id for easy access
-    stats_by_player_id = {stat['player_id']
-        : stat for stat in player_stats_season}
-    details_by_player_id = {detail['player_id']
-        : detail for detail in player_details}
+    stats_by_player_id = {stat['player_id']                          : stat for stat in player_stats_season}
+    details_by_player_id = {detail['player_id']                            : detail for detail in player_details}
 
     for player in all_players:
 
@@ -69,9 +67,9 @@ def update_player_stats():
                 'fan_pts': fan_pts
             }
         )
-    
-    # Update the Players endpoin
-    update_endpoint()
+
+    # Update the endpoins
+    update_players_endpoint()
 
 
 @shared_task
@@ -94,14 +92,13 @@ def update_player_status():
         player_model.save()
 
 
-def update_endpoint():
-    print("updating endpoint")
-    # Clear all existing endpoint objects
-    Endpoint.objects.all().delete()
+def update_players_endpoint():
+    # Clear existing players endpoint objects
+    Endpoint.objects.filter(page='players').delete()
 
     # Update players endpoint
     injured = Player.objects.filter((Q(status='INJ') | Q(status='O')) & Q(
-        fan_pts__gte=28)).order_by("time_of_last_update", "-fan_pts")
+        fan_pts__gte=25)).order_by("team", "-fan_pts")
 
     injured_players = {}
     for player in injured:
@@ -142,7 +139,8 @@ def update_endpoint():
                 float(player.to_per_game)
             ],
             'benefiting_players': benefiting_players_with_stats,
-            'time_of_injury': player.time_of_last_update.isoformat(),  # Convert datetime to ISO 8601 string
+            # Convert datetime to ISO 8601 string
+            'time_of_injury': player.time_of_last_update.isoformat(),
             'status': player.status,
         }
 
