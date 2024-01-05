@@ -44,7 +44,7 @@
 }
 
 .row-item img {
-  max-height: 50px;
+  max-height: 40px;
   max-width: 50px;
   align-self: center;
   /* Add this line */
@@ -53,4 +53,9 @@
 .status {
   font-weight: bold;
   color: red;
+}
+
+.table {
+  max-width: 960px;
+  border-radius: 24px;
 }

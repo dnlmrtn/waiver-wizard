@@ -1,15 +1,33 @@
 .App {
-  text-align: left;
+  text-align: center;
+  background-color: #f9f9f9;
+  /* Set the background color for the entire app */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: 20px;
+  /* Add padding for spacing around the content */
+  box-sizing: border-box;
+}
+
+.content {
+  max-width: 1440px;
+  width: 100%;
+  margin: 0 auto;
+  /* Center the content block */
+  background-color: #f9f9f9;
 }
 
 .App-header {
-  background-color: #ffffff;
-  display: flexbox;
+  width: 100%;
+  /* Ensure header takes full width of its container */
+  padding: 16px;
+  display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding-left: 16px;
-
+  font-size: 48px;
 }
 
 .heading {
@@ -22,6 +40,7 @@
 .subtitle {
   font-size: 16px;
   color: #191919;
+  text-align: center;
 }
 
 ul {
@@ -72,4 +91,19 @@ nav {
 .menu-items {
   position: relative;
   font-size: 14px;
+}
+
+.table-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+}
+
+.table {
+  background-color: #ffffff;
+  width: 960px;
+  border-radius: 24px;
+  border-color: #191919;
+  border-width: 4px;
 }
