@@ -1,5 +1,8 @@
 .env
+.env.dev
+.env.prod
+core/api
 docker-compose.yml
 Dockerfile
-core/api/token.json
-app/settings.py
+package-lock.json
+package.json

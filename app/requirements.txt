@@ -5,4 +5,4 @@ psycopg2==2.9.9
 importlib-metadata==4.13.0
 yahoo-fantasy-api==2.8.0
 yahoo-oauth==2.0
-requests==2.26.0x1
+python-dotenv

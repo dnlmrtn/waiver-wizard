@@ -33,8 +33,8 @@ def update_player_stats():
         [player["player_id"] for player in all_players])
 
     # Mapping stats by player_id for easy access
-    stats_by_player_id = {stat['player_id']                          : stat for stat in player_stats_season}
-    details_by_player_id = {detail['player_id']                            : detail for detail in player_details}
+    stats_by_player_id = {stat['player_id']: stat for stat in player_stats_season}
+    details_by_player_id = {detail['player_id']: detail for detail in player_details}
 
     for player in all_players:
 

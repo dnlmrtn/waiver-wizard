@@ -12,6 +12,17 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 
 from pathlib import Path
 import os
+import json
+from dotenv import load_dotenv
+
+# Determine which environment file to load
+if os.environ.get('DJANGO_ENV') == 'prod':
+    dotenv_path = os.path.join(os.path.dirname(__file__), '.env.prod')
+else:
+    dotenv_path = os.path.join(os.path.dirname(__file__), '.env.dev')
+
+# Load the environment file
+load_dotenv(dotenv_path)
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -20,12 +31,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-74ek#$su&p=oz$_al^9pz7q#olw4_vo6s70$jgwb_@cl_=hw2m'
+SECRET_KEY = os.environ.get("SECRET_KEY")
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
+DEBUG = os.environ.get('DEBUG', 'False') == 'True'
 
 # Application definition
 
@@ -135,9 +143,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 CELERY_BROKER_URL = "redis://redis:6379"
 CELERY_RESULT_BACKEND = "redis://redis:6379"
 
-ALLOWED_HOSTS = ['0.0.0.0', 'localhost',
-                 '127.0.0.1']
+ALLOWED_HOSTS = json.loads(os.environ.get("ALLOWED_HOSTS"))
 
-CORS_ORIGIN_WHITELIST = [
-    'http://localhost:3000'
-]
+
+CORS_ORIGIN_WHITELIST = [os.environ.get("CORS_ORIGIN_WHITELIST")]
