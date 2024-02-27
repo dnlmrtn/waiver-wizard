@@ -37,7 +37,6 @@ def update_player_stats():
     details_by_player_id = {detail['player_id']: detail for detail in player_details}
 
     for player in all_players:
-
         player_id = player['player_id']
         stats = stats_by_player_id.get(player_id, {})
         details = details_by_player_id.get(str(player_id), {})
@@ -102,7 +101,6 @@ def update_players_endpoint():
 
     injured_players = {}
     for player in injured:
-
         positions = player.positions.split(",")
         same_team_and_fantasy_points_query = Q(team=player.team) & Q(
             fan_pts__lt=player.fan_pts) & Q(fan_pts__lt=35) & Q(status='H')

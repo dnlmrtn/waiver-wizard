@@ -1,0 +1,10 @@
+.footer-container {
+    display: flex;
+    justify-content: center;
+}
+
+.footer-notes {
+    font-size: 12px;
+    color: #d9dadb;
+    text-align: left;
+}

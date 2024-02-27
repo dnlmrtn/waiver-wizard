@@ -3,8 +3,10 @@ import '../static/App.css';
 const Layout = () => {
     return (
         <div>
-            <div className="content">
-                <Outlet />
+            <div className='content-container' style={{ backgroundColor: "#1b1c22" }}>
+                <div className="content">
+                    <Outlet />
+                </div>
             </div>
         </div>
     );

@@ -1,6 +1,6 @@
 .App {
   text-align: center;
-  background-color: #f9f9f9;
+  background-color: #1b1c22;
   /* Set the background color for the entire app */
   display: flex;
   justify-content: center;
@@ -11,12 +11,16 @@
   box-sizing: border-box;
 }
 
+body {
+  font-family: 'Roboto', sans-serif;
+}
+
 .content {
   max-width: 1440px;
   width: 100%;
   margin: 0 auto;
   /* Center the content block */
-  background-color: #f9f9f9;
+  background-color: #1b1c22;
 }
 
 .App-header {
@@ -28,18 +32,19 @@
   align-items: center;
   justify-content: center;
   font-size: 48px;
+  color: #d9dadb;
 }
 
 .heading {
-  color: "#191919";
+  color: "#1b1c22";
   font-size: calc(10px + 2vmin);
   text-align: left;
-  color: '#222222'
+  color: '#d9dadb'
 }
 
 .subtitle {
   font-size: 16px;
-  color: #191919;
+  color: #d9dadb;
   text-align: center;
 }
 
@@ -57,20 +62,13 @@ nav {
   height: 40px;
 
   border-bottom: 2px solid #191919;
-  background-color: var(--background-color);
+  background-color: var(#1b1c22);
 }
 
 .link-button {
   display: flexbox;
   flex-direction: column;
-  align-items: center;
-
-  color: inherit;
-  font-size: inherit;
-  background-color: transparent;
-  cursor: pointer;
-  width: 100%;
-  padding-top: 4px;
+  margin: 0 auto;
   padding-bottom: 4px;
   text-decoration: none;
   border: none;
@@ -101,7 +99,6 @@ nav {
 }
 
 .table {
-  background-color: #ffffff;
   width: 960px;
   border-radius: 24px;
   border-color: #191919;
