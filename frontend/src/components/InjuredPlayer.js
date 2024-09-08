@@ -18,30 +18,36 @@ const InjuredPlayer = ({ playerName, playerData }) => {
   return (
     <>
       <div className="table-row" onClick={toggleBenefitingPlayers}>
-        <div className="row-item"><img src={playerData.photo_url} alt={playerName} /></div>
-        <div className="row-item">{playerName}</div>
-        {playerData.stats.map((stat, index) => (
-          <div key={index} className="row-item">{stat}</div>
-        ))}
-        <div className="row-item">
+        <div className="player-image"><img src={playerData.photo_url} alt={playerName} /></div>
+        <div className='player-data-container'>
+          <div className="player-name">{playerName}</div>
+          <div className='stat-line'>
+            {playerData.stats.map((stat, index) => (
+              <div key={index} className="row-item">{stat}</div>
+            ))}
+          </div>
+        </div >
+        <div className="injury-status">
           <span className="status" style={{ color: 'red', fontWeight: injuryDate >= threeDaysAgo ? "bold" : "" }}>{playerData.status}<br /><div style={{ color: '#d9dadb' }}>{new Date(playerData.time_of_injury).toLocaleDateString()}</div></span>
         </div>
-      </div >
 
-      {showBenefitingPlayers && (
-        <div className="benefiting-players">
-          {Object.entries(playerData.benefiting_players).map(([benefitingPlayer, stats]) => (
-            <div key={benefitingPlayer} className="benefiting-player-row">
+      </div>
 
-              <div className="benefiting-player-item">{benefitingPlayer}</div>
-              {stats.map((stat, index) => (
-                <div key={index} className="benefiting-player-item">{stat}</div>
-              ))}
 
-            </div>
-          ))}
-        </div>
-      )}
+
+      {/* Add 'show-benefiting-players' class conditionally based on 'showBenefitingPlayers' state */}
+      <div className={`benefiting-players ${showBenefitingPlayers ? "show-benefiting-players" : ""}`}>
+        {Object.entries(playerData.benefiting_players).map(([benefitingPlayer, stats]) => (
+
+          <div key={benefitingPlayer} className="benefiting-player-row">
+            <div className="benefiting-player-item">{benefitingPlayer}</div>
+            {stats.map((stat, index) => (
+              <div key={index} className="benefiting-player-item">{stat}</div>
+            ))}
+
+          </div>
+        ))}
+      </div>
     </>
   );
 };

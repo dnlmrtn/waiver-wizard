@@ -32,7 +32,6 @@ function Players() {
           <div className='table'>
             <div className='table-header'>
               <div className='header-item'></div>
-              <div className='header-item'>Name</div>
               <div className='header-item'>PTS</div>
               <div className='header-item'>REB</div>
               <div className='header-item'>AST</div>

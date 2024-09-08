@@ -1,8 +1,6 @@
-.env
 .env.dev
 .env.prod
 core/api
-docker-compose.yml
-Dockerfile
 package-lock.json
 package.json
+venv
