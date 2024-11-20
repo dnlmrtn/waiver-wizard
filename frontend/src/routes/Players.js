@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 
 import InjuredPlayer from '../components/InjuredPlayer';
+import axios from 'axios';
 
 import '../static/InjuredPlayer.css'
 import '../static/index.css'
@@ -10,14 +11,20 @@ import Footer from '../components/Footer.js';
 
 function Players() {
   const [playersData, setPlayersData] = useState({});
+  const apiBaseUrl = process.env.SITE_URL;
 
   useEffect(() => {
-    fetch('http://0.0.0.0:8000/benefitting/')
-      .then(res => res.json())
-      .then(data => {
-        setPlayersData(data);
-      });
-  }, []);
+        axios
+            .get('http://localhost:8000/api/benefitting', { withCredentials: true })
+            .then((res) => {
+                setPlayersData(res.data);
+            })
+            .catch((error) => {
+                console.error('Error fetching flow data:', error);
+            });
+    }, []);
+
+  console.log(playersData)
 
   return (
     <div className="App">

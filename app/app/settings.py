@@ -10,12 +10,11 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 
-from pathlib import Path
 import os
-import json
 from dotenv import load_dotenv
 
 # Determine which environment file to load
+dotenv_path = os.path.join(os.path.dirname(__file__), '.env.dev')
 if os.environ.get('DJANGO_ENV') == 'prod':
     dotenv_path = os.path.join(os.path.dirname(__file__), '.env.prod')
 else:
@@ -23,9 +22,6 @@ else:
 
 # Load the environment file
 load_dotenv(dotenv_path)
-
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent
 
 
 # Quick-start development settings - unsuitable for production
@@ -143,7 +139,15 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 CELERY_BROKER_URL = "redis://redis:6379"
 CELERY_RESULT_BACKEND = "redis://redis:6379"
 
-ALLOWED_HOSTS = json.loads(os.environ.get("ALLOWED_HOSTS"))
+#ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS")
+ALLOWED_HOSTS = ["localhost"]
 
+if DEBUG == True:
+    CORS_ALLOW_CREDENTIALS = True
+    CORS_ORIGIN_ALLOW_ALL = True  # Disable the wildcard setting
+    CORS_ALLOW_CREDENTIALS = True  # Allow cookies
 
-CORS_ORIGIN_WHITELIST = [os.environ.get("CORS_ORIGIN_WHITELIST")]
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",
+]
+

@@ -17,4 +17,7 @@ RUN chmod -R 755 /app
 
 USER adminuser
 
-CMD ["sh", "-c", "python /app/wait_for_db.py && python /app/create_superuser.py", "gunicorn app.wsgi:application --bind 0.0.0.0:8000"]
+COPY . .
+EXPOSE 8000
+
+CMD ["gunicorn", "--bind", "0.0.0.0:8000", "app.wsgi:application"]

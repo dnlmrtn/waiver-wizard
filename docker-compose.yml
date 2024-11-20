@@ -27,6 +27,25 @@ services:
       - "3000:3000"
     volumes:
       - ./frontend:/frontend
+    environment:
+      - SITE_URL=${SITE_URL}
+
+  nginx:
+    restart: always
+    build:
+      context: .
+      dockerfile: Dockerfile.nginx
+    image: nginx:alpine
+    ports:
+      - "80:80"
+      - 443:443
+    depends_on:
+      - app
+    logging:
+      driver: "json-file"
+      options:
+        max-file: "5"
+        max-size: "10m"
 
   db:
     image: postgres:16-alpine
@@ -42,15 +61,7 @@ services:
     restart: always
     build:
       context: ./app
-    command:
-      [
-        "celery",
-        "-A",
-        "app",
-        "worker",
-        "--loglevel=info",
-        "-E"
-      ]
+    command: [ "celery", "-A", "app", "worker", "--loglevel=info", "-E" ]
     volumes:
       - ./app:/app
     env_file:
@@ -62,16 +73,7 @@ services:
 
   celery-beat:
     build: ./app
-    command:
-      [
-        "celery",
-        "-A",
-        "app",
-        "beat",
-        "--loglevel=info",
-        "--pidfile=/tmp/celerybeat.pid",
-        "--schedule=/tmp/celerybeat-schedule"
-      ]
+    command: [ "celery", "-A", "app", "beat", "--loglevel=info", "--pidfile=/tmp/celerybeat.pid", "--schedule=/tmp/celerybeat-schedule" ]
     volumes:
       - ./app:/app
     env_file:

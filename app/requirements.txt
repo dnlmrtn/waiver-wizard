@@ -1,5 +1,5 @@
 Django>=2.2
-celery==4.4.1
+celery==5.4.0
 redis==3.4.1
 psycopg2==2.9.9
 importlib-metadata==4.13.0
@@ -9,3 +9,5 @@ python-dotenv
 gunicorn
 django-cors-headers
 django-ratelimit
+django-environ==0.10.0
+

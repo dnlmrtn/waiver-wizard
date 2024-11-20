@@ -25,8 +25,4 @@ app.conf.beat_schedule = {
         'task': 'core.tasks.update_player_stats',
         'schedule': crontab(minute='7')
     },
-    'update_player_status': {
-        'task': 'core.tasks.update_player_status',
-        'schedule': crontab(minute='*/10'),
-    },
 }

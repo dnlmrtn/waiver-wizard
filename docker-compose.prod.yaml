@@ -35,15 +35,7 @@ services:
     restart: always
     build:
       context: ./app
-    command:
-      [
-        "celery",
-        "-A",
-        "app",
-        "worker",
-        "--loglevel=info",
-        "-E"
-      ]
+    command: [ "celery", "-A", "app", "worker", "--loglevel=info", "-E" ]
     volumes:
       - ./app:/app
     env_file:
@@ -55,16 +47,7 @@ services:
 
   celery-beat:
     build: ./app
-    command:
-      [
-        "celery",
-        "-A",
-        "app",
-        "beat",
-        "--loglevel=info",
-        "--pidfile=/tmp/celerybeat.pid",
-        "--schedule=/tmp/celerybeat-schedule"
-      ]
+    command: [ "celery", "-A", "app", "beat", "--loglevel=info", "--pidfile=/tmp/celerybeat.pid", "--schedule=/tmp/celerybeat-schedule" ]
     volumes:
       - ./app:/app
     env_file:
@@ -72,11 +55,22 @@ services:
     depends_on:
       - db
       - redis
-  
   nginx:
-    image: nginx:latest
+    restart: always
+    build:
+      context: .
+      dockerfile: Dockerfile.nginx
+    image: nginx:alpine
     ports:
-      - 80:80
+      - "80:80"
+      - 443:443
+    depends_on:
+      - app
+    logging:
+      driver: "json-file"
+      options:
+        max-file: "5"
+        max-size: "10m"
 
 volumes:
   pgdata:
