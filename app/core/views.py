@@ -25,5 +25,8 @@ def injuries(request):
     return HttpResponse(injured)
 
 def benefitting(request):
-    data = Endpoint.objects.filter(page='players')[0].data
-    return JsonResponse(json.loads(data))
+    try:
+        data = Endpoint.objects.get(page='players').data
+        return JsonResponse(data)
+    except Exception as e:
+        raise e

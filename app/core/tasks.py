@@ -34,7 +34,6 @@ def update_player_stats():
             player_id = int(player['player_id'])
             stats = yahoo_service.get_player_stats_season([player_id])[0]
             details=yahoo_service.get_player_details(player_id)
-            print(details)
             pts = get_stat_or_zero(stats.get('PTS', 0))
             ast = get_stat_or_zero(stats.get('AST', 0))
             reb = get_stat_or_zero(stats.get('REB', 0))
@@ -43,9 +42,6 @@ def update_player_stats():
             to = get_stat_or_zero(stats.get('TO', 0))
 
             fan_pts = pts + 1.2*reb + 1.5*ast + 3*st + 3*blk - 1.5*to
-            print(player['name'])
-            print(", ".join([p for p in player["eligible_positions"] if p not in ["G", "F", "IL+", "IL", "Util"]]))
-            print('H' if not player.get('status') else player['status'])
 
             player_model, created = Player.objects.update_or_create(
                 yahoo_id=player_id,
@@ -64,7 +60,6 @@ def update_player_stats():
                     'fan_pts': fan_pts
                 }
             )
-            print("created")
         except Exception as e:
             print(e)
     # Update the endpoins
@@ -124,6 +119,8 @@ def update_players_endpoint():
                 float(benefiting_player.to_per_game)
             ] for benefiting_player in benefiting_players
         }
+        print(player.photo_url)
+        print(benefiting_players_with_stats)
 
         injured_players[player.name] = {
             'photo_url': player.photo_url,
@@ -140,9 +137,10 @@ def update_players_endpoint():
             'time_of_injury': player.time_of_last_update.isoformat(),
             'status': player.status,
         }
+        print(injured_players[player.name])
 
     Endpoint.objects.create(
-        page="players", data=json.dumps(injured_players))
+        page="players", data=injured_players)
 
 
 @worker_ready.connect

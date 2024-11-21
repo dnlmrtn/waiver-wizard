@@ -1,6 +1,8 @@
 .env.dev
 .env.prod
-core/api
+app/core/api/token.json
 package-lock.json
 package.json
 venv
+__pycache__/
+
