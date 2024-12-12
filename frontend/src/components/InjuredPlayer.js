@@ -33,8 +33,6 @@ const InjuredPlayer = ({ playerName, playerData }) => {
 
       </div>
 
-
-
       {/* Add 'show-benefiting-players' class conditionally based on 'showBenefitingPlayers' state */}
       <div className={`benefiting-players ${showBenefitingPlayers ? "show-benefiting-players" : ""}`}>
         {Object.entries(playerData.benefiting_players).map(([benefitingPlayer, stats]) => (

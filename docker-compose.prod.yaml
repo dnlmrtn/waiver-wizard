@@ -1,26 +1,6 @@
 version: '3'
 
 services:
-  app:
-    build:
-      context: ./app
-    ports:
-      - "8000:8000"
-    volumes:
-      - ./app:/app
-    command: >
-      sh -c "
-            
-            python3 manage.py wait_for_db &&
-            python3 manage.py makemigrations &&
-            python3 manage.py migrate &&
-            python3 manage.py create_superuser &&
-            python3 manage.py runserver 0.0.0.0:8000"
-    env_file:
-      - .env.prod
-    depends_on:
-      - db
-
   db:
     image: postgres:16-alpine
     env_file:
@@ -28,8 +8,40 @@ services:
     ports:
       - "5432:5432"
 
+  app:
+    build: .
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./app:/app
+    command: >
+          /bin/bash -c "
+            cd /code/django;
+            gunicorn -w 4 app.wsgi:application --bind 0.0.0.0:8000
+          "
+    env_file:
+      - .env.prod
+    volumes:
+      - static_volume:/code/app/static
+      - media_volume:/code/app/media
+      - .:/code
+    depends_on:
+      - db
+    logging:
+      driver: "json-file"
+      options:
+          max-file: "5"
+          max-size: "10m"
+
   redis:
     image: redis:alpine
+    expose:
+      - 6379
+    logging:
+      driver: "json-file"
+      options:
+          max-file: "5"
+          max-size: "10m"
 
   celery:
     restart: always
@@ -55,6 +67,7 @@ services:
     depends_on:
       - db
       - redis
+
   nginx:
     restart: always
     build:
