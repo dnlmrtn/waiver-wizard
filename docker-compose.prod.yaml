@@ -11,13 +11,15 @@ services:
       - postgres_data:/var/lib/postgresql/data
       - ./scripts:/scripts
 
-
   app:
     build: .
     ports:
       - "8000:8000"
     volumes:
       - ./app:/app
+      - static_volume:/code/app/static
+      - media_volume:/code/app/media
+      - .:/code
     command: >
           /bin/bash -c "
             cd /code/django;
@@ -25,10 +27,6 @@ services:
           "
     env_file:
       - .env.prod
-    volumes:
-      - static_volume:/code/app/static
-      - media_volume:/code/app/media
-      - .:/code
     depends_on:
       - db
     logging:
