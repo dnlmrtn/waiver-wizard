@@ -21,13 +21,14 @@ else:
     dotenv_path = os.path.join(os.path.dirname(__file__), '.env.dev')
 
 # Load the environment file
-load_dotenv(dotenv_path)
 
+load_dotenv(dotenv_path)
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
 SECRET_KEY = os.environ.get("SECRET_KEY")
+LEAGUE_ID = os.getenv('LEAGUE_ID')
 
 DEBUG = os.environ.get('DEBUG', 'False') == 'True'
 

@@ -1,0 +1,4 @@
+psql -U ${DB_USER} <<-EOSQL
+    CREATE DATABASE ${DB_NAME};
+EOSQL
+

@@ -53,6 +53,9 @@ services:
       - .env.dev
     ports:
       - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./scripts:/scripts
 
   redis:
     image: redis:alpine
@@ -83,4 +86,4 @@ services:
       - redis
 
 volumes:
-  pgdata:
+  postgres_data:
