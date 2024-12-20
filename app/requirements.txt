@@ -1,7 +1,7 @@
 Django>=2.2
 celery==5.4.0
 redis==3.4.1
-psycopg2==2.9.9
+psycopg2-binary==2.9.9
 importlib-metadata==4.13.0
 yahoo-fantasy-api==2.8.0
 yahoo-oauth==2.0
