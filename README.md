@@ -61,4 +61,29 @@ To exit:
 ```
 
 ## Production Deployment
-sudo docker compose -f docker-compose.prod.yaml up -d redis celery celery-beat
+
+Create .env file from example:
+```bash
+cp .env.example .env.prod
+```
+
+### Install Requirements
+```bash
+bash ./scripts/install_requirements.sh
+```
+
+### Database Setup
+
+Ensure your `.env.prod` file has the necessary variables, then start the database container:
+```bash
+docker-compose up -d db
+```
+
+Run the database initialization script: 
+```bash
+docker exec waiver-wizard-db-1 bash /scripts/init_database.sh
+```
+Run production deployment script:
+```bash
+bash ./scripts/deploy_to_production.sh
+```
