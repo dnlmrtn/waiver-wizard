@@ -36,7 +36,7 @@ SITE_URL='localhost'
 
 ### Install Requirements
 ```bash
-bash ./scripts/install_requirements.txt
+bash ./scripts/install_requirements.sh
 ```
 
 ### Database Setup
@@ -60,4 +60,5 @@ To exit:
 \q
 ```
 
-
+## Production Deployment
+sudo docker compose -f docker-compose.prod.yaml up -d redis celery celery-beat
