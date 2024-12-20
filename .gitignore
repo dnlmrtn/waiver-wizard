@@ -5,4 +5,4 @@ package-lock.json
 package.json
 venv
 token.json
-#**/__pycache__/
+**/__pycache__/
