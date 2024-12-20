@@ -4,8 +4,7 @@ sudo apt-get remove docker docker-engine docker.io -y
 sudo apt install docker.io -y
 sudo systemctl start docker
 sudo systemctl enable docker
-sudo apt install docker-compose-plugin -y
-
+sudo apt-get install docker-compose-plugin
 python3 -m venv env
 source env/bin/activate
 
