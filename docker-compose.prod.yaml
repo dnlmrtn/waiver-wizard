@@ -10,7 +10,6 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./scripts:/scripts
-
   app:
     build: .
     ports:
@@ -88,4 +87,4 @@ services:
         max-size: "10m"
 
 volumes:
-  postgresdata:
+  postgres_data:
