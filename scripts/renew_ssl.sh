@@ -10,9 +10,9 @@ source .env.prod
 set +a
 
 # Configuration
-DOMAIN="${DOMAIN:-localhost}"  # Use DOMAIN from .env.prod or default to localhost
-EMAIL="${EMAIL:-admin@example.com}"  # Use EMAIL from .env.prod or default to admin@example.com
-NGINX_CONF="${NGINX_CONF:-/etc/nginx/sites-available/default}"  # Use NGINX_CONF from .env.prod or use default
+DOMAIN="waiver.minimaxenergy.com"
+EMAIL="dmartin@minimaxenergy.com"  # Use EMAIL from .env.prod or default to admin@example.com
+NGINX_CONF="/etc/nginx/sites-available/default"  # Use NGINX_CONF from .env.prod or use default
 
 # Function to check if command exists
 command_exists() {
