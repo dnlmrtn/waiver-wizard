@@ -1,7 +1,18 @@
+# Load environment variables from .env.prod
+if [ ! -f .env.prod ]; then
+    echo "Error: .env.prod file not found!"
+    exit 1
+fi
+
+# Source the .env.prod file
+set -a  # automatically export all variables
+source .env.prod
+set +a
+
 # Configuration
-DOMAIN="yourdomain.com"  # Replace with your domain
-EMAIL="your@email.com"   # Replace with your email
-NGINX_CONF="/etc/nginx/sites-available/default"  # Adjust path if needed
+DOMAIN="${DOMAIN:-localhost}"  # Use DOMAIN from .env.prod or default to localhost
+EMAIL="${EMAIL:-admin@example.com}"  # Use EMAIL from .env.prod or default to admin@example.com
+NGINX_CONF="${NGINX_CONF:-/etc/nginx/sites-available/default}"  # Use NGINX_CONF from .env.prod or use default
 
 # Function to check if command exists
 command_exists() {
