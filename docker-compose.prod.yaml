@@ -19,7 +19,7 @@ services:
       - ./app:/app
     command: >
       /bin/sh -c "
-      cd /code/app
+      cd /app
       gunicorn -w 4 app.wsgi:application --bind 0.0.0.0:8000
       "
     env_file:
