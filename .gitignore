@@ -6,4 +6,5 @@ package.json
 venv
 env
 token.json
+__pycache__/
 **/__pycache__/
