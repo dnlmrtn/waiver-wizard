@@ -141,7 +141,7 @@ CELERY_BROKER_URL = "redis://redis:6379"
 CELERY_RESULT_BACKEND = "redis://redis:6379"
 
 #ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS")
-ALLOWED_HOSTS = ["waiver.minimaxenergy.com"]
+ALLOWED_HOSTS = ["waiver.minimaxenergy.com", "54.210.158.172"]
 
 if DEBUG == True:
     CORS_ALLOW_CREDENTIALS = True
