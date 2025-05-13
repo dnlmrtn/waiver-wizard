@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 
 import os
 from dotenv import load_dotenv
+from pathlib import Path
 
 # Determine which environment file to load
 dotenv_path = os.path.join(os.path.dirname(__file__), '.env.dev')
@@ -75,6 +76,11 @@ TEMPLATES = [
     },
 ]
 
+CSRF_TRUSTED_ORIGINS = ['https://waiver.minimaxenergy.com']
+
+BASE_DIR = Path(__file__).resolve().parent.parent
+STATIC_URL = '/static/'
+STATIC_ROOT = BASE_DIR / 'static'
 WSGI_APPLICATION = 'app.wsgi.application'
 
 
