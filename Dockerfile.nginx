@@ -1,19 +1,11 @@
-# Stage 1: Build react app
-FROM node:20 as react_build
-WORKDIR /code
-# Copy package.json and package-lock.json
-COPY ./frontend/package*.json /code/
-# Copy the rest of the application code
-COPY ./frontend/. /code/
-
-# Use the official NGINX image
+# Stage 1:
 FROM nginx:1.17.2-alpine
 
-# Remove default NGINX configuration
 RUN rm -f /etc/nginx/conf.d/*
 
-# Copy your custom NGINX configuration
 COPY ./nginx/nginx.conf /etc/nginx/conf.d/default.conf
 
-# Copy the built React app from your local machine
 COPY ./frontend/build /usr/share/nginx/html
+
+EXPOSE 80 443
+
