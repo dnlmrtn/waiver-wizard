@@ -1,12 +1,18 @@
 import yahoo_fantasy_api as yfa
 
-YEAR = 2023
+YEAR = 2025
 
 
 class YahooFantasyAPIService:
     def __init__(self, sc, league_id):
         self.gm = yfa.Game(sc, 'nba')
-        self.lg = self.gm.to_league(league_id)
+
+        print(self.gm.league_ids())
+        print(league_id)
+        self.lg = self.gm.to_league("466.l.24543")
+
+        print(self.lg.current_week())
+        print(self.lg.end_week())
 
     def get_all_players(self) -> list:
         return self.lg.free_agents("Util") + self.lg.taken_players()
