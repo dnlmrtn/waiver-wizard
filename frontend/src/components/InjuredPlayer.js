@@ -25,6 +25,7 @@ const InjuredPlayer = ({ playerName, playerData }) => {
             {playerData.stats.map((stat, index) => (
               <div key={index} className="row-item">{stat}</div>
             ))}
+            <div className="row-item">{playerData.percent_owned != null ? `${Number(playerData.percent_owned).toFixed(1)}%` : 'N/A'}</div>
           </div>
         </div >
         <div className="injury-status">
@@ -35,14 +36,14 @@ const InjuredPlayer = ({ playerName, playerData }) => {
 
       {/* Add 'show-benefiting-players' class conditionally based on 'showBenefitingPlayers' state */}
       <div className={`benefiting-players ${showBenefitingPlayers ? "show-benefiting-players" : ""}`}>
-        {Object.entries(playerData.benefiting_players).map(([benefitingPlayer, stats]) => (
-
+        {Object.entries(playerData.benefiting_players).map(([benefitingPlayer, info]) => (
           <div key={benefitingPlayer} className="benefiting-player-row">
+            <div className="player-image"><img src={info.photo_url} alt={benefitingPlayer} /></div>
             <div className="benefiting-player-item">{benefitingPlayer}</div>
-            {stats.map((stat, index) => (
+            {info.stats.map((stat, index) => (
               <div key={index} className="benefiting-player-item">{stat}</div>
             ))}
-
+            <div className="benefiting-player-item">{info.percent_owned != null ? `${Number(info.percent_owned).toFixed(1)}%` : 'N/A'}</div>
           </div>
         ))}
       </div>

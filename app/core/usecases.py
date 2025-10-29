@@ -153,6 +153,11 @@ class UpdatePlayerDataUseCase:
     
 
 class UpdateBenefittingPlayersEndpointUseCase:
+   def __init__(self):
+       self.league_id = settings.LEAGUE_ID
+       self.sc = OAuth2(None, None, from_file='core/api/token.json')
+       self.yahoo_service = YahooFantasyAPIService(self.sc, league_id=self.league_id)
+
    def execute(self):
        """Main method to update the players endpoint with injury and benefiting player data."""
        self._clear_existing_endpoint()
@@ -201,12 +206,40 @@ class UpdateBenefittingPlayersEndpointUseCase:
            float(player.to_per_game)
        ]
 
-   def _get_benefiting_players_stats(self, benefiting_players):
-       """Creates a dictionary of benefiting players and their stats."""
-       return {
-           player.name: self._extract_player_stats(player)
-           for player in benefiting_players
-       }
+   def _get_percent_owned_map_by_ids(self, player_ids):
+       """Returns a mapping of yahoo_id -> percent owned (float) for given IDs."""
+       if not player_ids:
+           return {}
+       try:
+           ownership_list = self.yahoo_service.get_percent_owned(player_ids)
+       except Exception:
+           ownership_list = []
+
+       id_to_owned = {}
+       for entry in ownership_list or []:
+           raw_player_id = entry.get('player_id')
+           try:
+               player_id = int(raw_player_id) if raw_player_id is not None else None
+           except ValueError:
+               player_id = None
+
+           ownership = entry.get('ownership') or {}
+           percent_value = ownership.get('percent_owned') or ownership.get('ownership_percentage')
+           if isinstance(percent_value, str):
+               percent_value = percent_value.replace('%', '').strip()
+               try:
+                   percent_value = float(percent_value)
+               except ValueError:
+                   percent_value = None
+           elif isinstance(percent_value, (int, float)):
+               percent_value = float(percent_value)
+           else:
+               percent_value = None
+
+           if player_id is not None:
+               id_to_owned[player_id] = percent_value
+
+       return id_to_owned
 
    def _process_injured_players(self, injured_players):
        """Processes each injured player and their potential beneficiaries."""
@@ -214,12 +247,25 @@ class UpdateBenefittingPlayersEndpointUseCase:
        
        for player in injured_players:
            benefiting_players = self._get_benefiting_players(player)
-           benefiting_players_stats = self._get_benefiting_players_stats(benefiting_players)
+           # Build ownership map for both injured and benefiting players in one call
+           yahoo_ids = [int(player.yahoo_id)] + [int(p.yahoo_id) for p in benefiting_players]
+           id_to_owned = self._get_percent_owned_map_by_ids(yahoo_ids)
+
+           # Build benefiting players detailed data
+           benefiting_players_data = {
+               p.name: {
+                   'photo_url': p.photo_url,
+                   'stats': self._extract_player_stats(p),
+                   'percent_owned': id_to_owned.get(int(p.yahoo_id))
+               }
+               for p in benefiting_players
+           }
 
            injured_players_data[player.name] = {
                'photo_url': player.photo_url,
                'stats': self._extract_player_stats(player),
-               'benefiting_players': benefiting_players_stats,
+               'percent_owned': id_to_owned.get(int(player.yahoo_id)),
+               'benefiting_players': benefiting_players_data,
                'time_of_injury': player.time_of_last_update.isoformat(),
                'status': player.status,
            }

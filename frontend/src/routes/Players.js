@@ -8,7 +8,10 @@ import '../static/index.css';
 import '../static/App.css';
 
 function Players() {
+
+    console.log("Test")
   const { playersData, error } = useBenefittingPlayers();
+    console.log(error)
 
   if (error) {
     return <div className="App">Failed to load players data.</div>;
@@ -31,6 +34,7 @@ function Players() {
               <div className="header-item">STL</div>
               <div className="header-item">BLK</div>
               <div className="header-item">TOV</div>
+              <div className="header-item">OWN</div>
               <div className="header-item">Status</div>
             </div>
             {Object.entries(playersData).map(([playerName, playerData]) => (
