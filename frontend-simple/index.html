@@ -3,42 +3,368 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Waiver Wizard</title>
-    <link rel="stylesheet" href="styles.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <title>Basketball Injury Tracker</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .subtitle {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .loading {
+            text-align: center;
+            color: white;
+            font-size: 1.2rem;
+            padding: 40px;
+        }
+
+        .error {
+            background: #ff4444;
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .players-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 20px;
+        }
+
+        .player-card {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .player-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+        }
+
+        .player-card.expanded {
+            transform: none;
+        }
+
+        .status-badge {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: #ff4444;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: bold;
+        }
+
+        .status-badge.out {
+            background: #ff9800;
+        }
+
+        .player-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .player-photo {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            object-fit: cover;
+            background: #f0f0f0;
+            border: 3px solid #667eea;
+        }
+
+        .player-info {
+            flex: 1;
+        }
+
+        .player-name {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .injury-time {
+            font-size: 0.85rem;
+            color: #666;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 10px;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 2px solid #f0f0f0;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-label {
+            font-size: 0.7rem;
+            color: #999;
+            text-transform: uppercase;
+            font-weight: 600;
+            margin-bottom: 3px;
+        }
+
+        .stat-value {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #333;
+        }
+
+        .benefitting-section {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease;
+        }
+
+        .player-card.expanded .benefitting-section {
+            max-height: 2000px;
+        }
+
+        .benefitting-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 15px;
+            margin: 15px -20px 15px;
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        .benefitting-player {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 10px;
+            transition: background 0.2s ease;
+        }
+
+        .benefitting-player:hover {
+            background: #e9ecef;
+        }
+
+        .benefitting-player .player-header {
+            margin-bottom: 10px;
+        }
+
+        .benefitting-player .player-photo {
+            width: 45px;
+            height: 45px;
+            border: 2px solid #667eea;
+        }
+
+        .benefitting-player .player-name {
+            font-size: 1.1rem;
+        }
+
+        .benefitting-player .stats-grid {
+            border-top: 1px solid #dee2e6;
+            padding-top: 10px;
+            margin-top: 10px;
+        }
+
+        .expand-indicator {
+            text-align: center;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 2px solid #f0f0f0;
+            font-size: 0.85rem;
+            color: #667eea;
+            font-weight: 600;
+        }
+
+        .player-card.expanded .expand-indicator {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .players-grid {
+                grid-template-columns: 1fr;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 8px;
+            }
+        }
+    </style>
 </head>
 <body>
-    <div class="app">
-        <div class="content">
-            <header class="app-header">Waiver Wizard</header>
-            <div class="subtitle">
-                Displaying injured NBA players, click one to see who benefits.
-            </div>
-            <div id="error-message" class="error-message" style="display: none;">
-                Failed to load players data.
-            </div>
-            <div id="loading" class="loading">Loading...</div>
-            <div class="table-container">
-                <div class="table">
-                    <div class="table-header">
-                        <div class="header-item header-chevron"></div>
-                        <div class="header-item col-player">PLAYER</div>
-                        <div class="header-item">PTS</div>
-                        <div class="header-item">REB</div>
-                        <div class="header-item">AST</div>
-                        <div class="header-item">STL</div>
-                        <div class="header-item">BLK</div>
-                        <div class="header-item">TOV</div>
-                        <div class="header-item">OWN</div>
-                        <div class="header-item">Status</div>
-                    </div>
-                    <div id="players-container"></div>
-                </div>
-            </div>
-        </div>
+    <div class="container">
+        <header>
+            <h1>🏀 Basketball Injury Tracker</h1>
+            <p class="subtitle">Track injured players and discover waiver wire opportunities</p>
+        </header>
+
+        <div id="content"></div>
     </div>
-    <script src="app.js"></script>
+
+    <script>
+        const STAT_LABELS = ['PTS', 'REB', 'AST', 'STL', 'BLK', 'TOV'];
+
+        function formatTimeAgo(timestamp) {
+            const now = new Date();
+            const injuryTime = new Date(timestamp);
+            const diffMs = now - injuryTime;
+            const diffMins = Math.floor(diffMs / 60000);
+            const diffHours = Math.floor(diffMs / 3600000);
+            const diffDays = Math.floor(diffMs / 86400000);
+
+            if (diffMins < 60) {
+                return `${diffMins} minute${diffMins !== 1 ? 's' : ''} ago`;
+            } else if (diffHours < 24) {
+                return `${diffHours} hour${diffHours !== 1 ? 's' : ''} ago`;
+            } else {
+                return `${diffDays} day${diffDays !== 1 ? 's' : ''} ago`;
+            }
+        }
+
+        function createStatsGrid(stats) {
+            return `
+                <div class="stats-grid">
+                    ${stats.map((stat, idx) => `
+                        <div class="stat-item">
+                            <div class="stat-label">${STAT_LABELS[idx]}</div>
+                            <div class="stat-value">${stat.toFixed(1)}</div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        function createBenefittingPlayer(name, data) {
+            return `
+                <div class="benefitting-player">
+                    <div class="player-header">
+                        <img src="${data.photo_url}" alt="${name}" class="player-photo" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2260%22 height=%2260%22%3E%3Crect fill=%22%23ddd%22 width=%2260%22 height=%2260%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-size=%2224%22 fill=%22%23999%22%3E?%3C/text%3E%3C/svg%3E'">
+                        <div class="player-info">
+                            <div class="player-name">${name}</div>
+                        </div>
+                    </div>
+                    ${createStatsGrid(data.stats)}
+                </div>
+            `;
+        }
+
+        function createPlayerCard(name, data) {
+            const benefittingPlayers = Object.entries(data.benefiting_players || {})
+                .map(([pName, pData]) => createBenefittingPlayer(pName, pData))
+                .join('');
+
+            const benefittingCount = Object.keys(data.benefiting_players || {}).length;
+
+            return `
+                <div class="player-card" onclick="toggleCard(this)">
+                    <div class="status-badge ${data.status === 'O' ? 'out' : ''}">${data.status}</div>
+                    <div class="player-header">
+                        <img src="${data.photo_url}" alt="${name}" class="player-photo" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2260%22 height=%2260%22%3E%3Crect fill=%22%23ddd%22 width=%2260%22 height=%2260%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-size=%2224%22 fill=%22%23999%22%3E?%3C/text%3E%3C/svg%3E'">
+                        <div class="player-info">
+                            <div class="player-name">${name}</div>
+                            <div class="injury-time">⏱️ ${formatTimeAgo(data.time_of_injury)}</div>
+                        </div>
+                    </div>
+                    ${createStatsGrid(data.stats)}
+                    ${benefittingCount > 0 ? `
+                        <div class="expand-indicator">
+                            👆 Click to see ${benefittingCount} benefiting player${benefittingCount !== 1 ? 's' : ''}
+                        </div>
+                        <div class="benefitting-section">
+                            <div class="benefitting-header">
+                                📈 Players Benefiting from Injury (${benefittingCount})
+                            </div>
+                            ${benefittingPlayers}
+                        </div>
+                    ` : ''}
+                </div>
+            `;
+        }
+
+        function toggleCard(card) {
+            card.classList.toggle('expanded');
+        }
+
+        async function loadData() {
+            const contentDiv = document.getElementById('content');
+            contentDiv.innerHTML = '<div class="loading">Loading injury data...</div>';
+
+            try {
+                const response = await fetch('https://waiver.minimaxenergy.com/api/benefitting');
+                console.log(response);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                
+                const playerCards = Object.entries(data)
+                    .map(([name, playerData]) => createPlayerCard(name, playerData))
+                    .join('');
+
+                contentDiv.innerHTML = `<div class="players-grid">${playerCards}</div>`;
+            } catch (err) {
+                contentDiv.innerHTML = `
+                    <div class="error">
+                        <h2>Error Loading Data</h2>
+                        <p>${err.message}</p>
+                        <p style="margin-top: 10px;">Using sample data instead...</p>
+                    </div>
+                `;
+                
+
+                contentDiv.innerHTML += `<div class="players-grid">${playerCards}</div>`;
+            }
+        }
+
+        loadData();
+    </script>
 </body>
 </html>
