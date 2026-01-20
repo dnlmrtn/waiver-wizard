@@ -352,6 +352,7 @@
             border-radius: 12px;
             padding: 15px;
             margin-bottom: 10px;
+            position: relative;
         }
 
         .benefitting-player .player-header {
@@ -372,6 +373,49 @@
             border-top: 1px solid #dee2e6;
             padding-top: 10px;
             margin-top: 10px;
+        }
+
+        /* New styles for benefitting score and message */
+        .benefitting-score-badge {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+        }
+
+        .benefitting-score-badge.high {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        }
+
+        .benefitting-score-badge.medium {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+        }
+
+        .benefitting-score-badge.low {
+            background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
+        }
+
+        .llm-message {
+            background: linear-gradient(135deg, #ede9fe 0%, #ddd6fe 100%);
+            border-left: 4px solid #8b5cf6;
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 12px;
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+            color: #4c1d95;
+            line-height: 1.5;
+        }
+
+        .llm-message::before {
+            content: "💡 ";
+            font-size: 1rem;
         }
 
         .expand-indicator {
@@ -525,6 +569,12 @@
                    (coefficients.tov * (tov || 0));
         }
 
+        function getScoreBadgeClass(score) {
+            if (score >= 70) return 'high';
+            if (score >= 40) return 'medium';
+            return 'low';
+        }
+
         function updateFormulaDisplay() {
             document.getElementById('ptsDisplay').textContent = `${coefficients.pts}×PTS`;
             document.getElementById('rebDisplay').textContent = `${coefficients.reb}×REB`;
@@ -624,14 +674,20 @@
         }
 
         function createBenefittingPlayer(name, data) {
+            const score = data.benefitting_score || 50;
+            const message = data.message || "Potential streaming option.";
+            const scoreClass = getScoreBadgeClass(score);
+            
             return `
                 <div class="benefitting-player">
+                    <div class="benefitting-score-badge ${scoreClass}">${score}/100</div>
                     <div class="player-header">
                         <img src="${data.photo_url}" alt="${name}" class="player-photo" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2260%22 height=%2260%22%3E%3Crect fill=%22%23ddd%22 width=%2260%22 height=%2260%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-size=%2224%22 fill=%22%23999%22%3E?%3C/text%3E%3C/svg%3E'">
                         <div class="player-info">
                             <div class="player-name">${name}</div>
                         </div>
                     </div>
+                    <div class="llm-message">${message}</div>
                     ${createStatsGrid(data.stats)}
                 </div>
             `;
@@ -708,81 +764,91 @@
                         "benefiting_players": {
                             "Anthony Davis": {
                                 "photo_url": "https://cdn.nba.com/headshots/nba/latest/1040x760/203076.png",
-                                "stats": [28.5, 12.5, 3.8, 1.5, 2.3, 2.1]
+                                "stats": [28.5, 12.5, 3.8, 1.5, 2.3, 2.1],
+                                "benefitting_score": 85,
+                                "message": "With LeBron out, AD will take on even more offensive responsibility and should see his usage rate spike significantly."
                             }
                         }
                     },
                     "Stephen Curry": {
                         "photo_url": "https://cdn.nba.com/headshots/nba/latest/1040x760/201939.png",
-                        "status": "D",
-                        "time_of_injury": "2024-01-20T10:15:00Z",
-                        "stats": [29.5, 5.5, 6.5, 1.2, 0.3, 3.2],
-                        "benefiting_players": {
-                            "Klay Thompson": {
-                                "photo_url": "https://cdn.nba.com/headshots/nba/latest/1040x760/202691.png",
-                                "stats": [22.5, 4.2, 2.8, 0.9, 0.5, 1.8]
-                            },
-                            "Chris Paul": {
-                                "photo_url": "https://cdn.nba.com/headshots/nba/latest/1040x760/101108.png",
-                                "stats": [9.5, 4.0, 7.5, 1.5, 0.2, 1.8]
-                            }
-                        }
-                    },
-                    "Nikola Jokic": {
-                        "photo_url": "https://cdn.nba.com/headshots/nba/latest/1040x760/203999.png",
-                        "status": "Q",
-                        "time_of_injury": "2024-01-18T19:45:00Z",
-                        "stats": [26.1, 12.3, 9.3, 1.4, 0.9, 3.5],
-                        "benefiting_players": {
-                            "Aaron Gordon": {
-                                "photo_url": "https://cdn.nba.com/headshots/nba/latest/1040x760/203932.png",
-                                "stats": [14.0, 6.5, 3.2, 0.8, 0.6, 1.5]
-                            }
-                        }
-                    },
-                    "Luka Doncic": {
-                        "photo_url": "https://cdn.nba.com/headshots/nba/latest/1040x760/1629029.png",
-                        "status": "O",
-                        "time_of_injury": "2024-01-22T16:20:00Z",
-                        "stats": [33.8, 8.6, 9.2, 1.4, 0.6, 4.1],
-                        "benefiting_players": {
-                            "Kyrie Irving": {
-                                "photo_url": "https://cdn.nba.com/headshots/nba/latest/1040x760/202681.png",
-                                "stats": [26.5, 5.0, 5.8, 1.3, 0.5, 2.1]
-                            }
-                        }
-                    }
-                };
-                
-                renderPlayers();
-            }
+"status": "D",
+"time_of_injury": "2024-01-20T10:15:00Z",
+"stats": [29.5, 5.5, 6.5, 1.2, 0.3, 3.2],
+"benefiting_players": {
+"Klay Thompson": {
+"photo_url": "https://cdn.nba.com/headshots/nba/latest/1040x760/202691.png",
+"stats": [22.5, 4.2, 2.8, 0.9, 0.5, 1.8],
+"benefitting_score": 72,
+"message": "Klay should see more touches and shooting opportunities, making him a solid streaming option while Curry is out."
+},
+"Chris Paul": {
+"photo_url": "https://cdn.nba.com/headshots/nba/latest/1040x760/101108.png",
+"stats": [9.5, 4.0, 7.5, 1.5, 0.2, 1.8],
+"benefitting_score": 68,
+"message": "CP3 will handle primary ball-handling duties and should rack up assists in Curry's absence."
+}
+}
+},
+"Nikola Jokic": {
+"photo_url": "https://cdn.nba.com/headshots/nba/latest/1040x760/203999.png",
+"status": "Q",
+"time_of_injury": "2024-01-18T19:45:00Z",
+"stats": [26.1, 12.3, 9.3, 1.4, 0.9, 3.5],
+"benefiting_players": {
+"Aaron Gordon": {
+"photo_url": "https://cdn.nba.com/headshots/nba/latest/1040x760/203932.png",
+"stats": [14.0, 6.5, 3.2, 0.8, 0.6, 1.5],
+"benefitting_score": 78,
+"message": "Gordon will be asked to step up offensively and could see career-high usage without Jokic on the floor."
+}
+}
+},
+"Luka Doncic": {
+"photo_url": "https://cdn.nba.com/headshots/nba/latest/1040x760/1629029.png",
+"status": "O",
+"time_of_injury": "2024-01-22T16:20:00Z",
+"stats": [33.8, 8.6, 9.2, 1.4, 0.6, 4.1],
+"benefiting_players": {
+"Kyrie Irving": {
+"photo_url": "https://cdn.nba.com/headshots/nba/latest/1040x760/202681.png",
+"stats": [26.5, 5.0, 5.8, 1.3, 0.5, 2.1],
+"benefitting_score": 92,
+"message": "Kyrie becomes the undisputed first option and should put up monster numbers across the board."
+}
+}
+}
+};
+renderPlayers();
         }
+    }
 
-        // Initialize event listeners
-        function initializeEventListeners() {
-            // Sort select
-            document.getElementById('sortSelect').addEventListener('change', (e) => {
-                currentSort = e.target.value;
-                renderPlayers();
-            });
-            
-            // Coefficient inputs
-            const coefficientInputs = ['ptsCoeff', 'rebCoeff', 'astCoeff', 'stlCoeff', 'blkCoeff', 'tovCoeff'];
-            coefficientInputs.forEach(inputId => {
-                document.getElementById(inputId).addEventListener('input', updateCoefficientsFromInputs);
-                document.getElementById(inputId).addEventListener('change', updateCoefficientsFromInputs);
-            });
-            
-            // Reset button
-            document.getElementById('resetButton').addEventListener('click', resetCoefficientsToDefault);
-            
-            // Initialize formula display
-            updateFormulaDisplay();
-        }
+    // Initialize event listeners
+    function initializeEventListeners() {
+        // Sort select
+        document.getElementById('sortSelect').addEventListener('change', (e) => {
+            currentSort = e.target.value;
+            renderPlayers();
+        });
+        
+        // Coefficient inputs
+        const coefficientInputs = ['ptsCoeff', 'rebCoeff', 'astCoeff', 'stlCoeff', 'blkCoeff', 'tovCoeff'];
+        coefficientInputs.forEach(inputId => {
+            document.getElementById(inputId).addEventListener('input', updateCoefficientsFromInputs);
+            document.getElementById(inputId).addEventListener('change', updateCoefficientsFromInputs);
+        });
+        
+        // Reset button
+        document.getElementById('resetButton').addEventListener('click', resetCoefficientsToDefault);
+        
+        // Initialize formula display
+        updateFormulaDisplay();
+    }
 
-        // Load data and initialize
-        loadData();
-        initializeEventListeners();
-    </script>
+    // Load data and initialize
+    loadData();
+    initializeEventListeners();
+</script>
 </body>
 </html>
+

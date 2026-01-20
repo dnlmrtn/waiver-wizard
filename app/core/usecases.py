@@ -1,3 +1,7 @@
+import requests
+import json
+import os
+
 from django.db.models import Q
 from django.conf import settings
 
@@ -154,9 +158,14 @@ class UpdatePlayerDataUseCase:
 
 class UpdateBenefittingPlayersEndpointUseCase:
    def __init__(self):
-       self.league_id = settings.LEAGUE_ID
-       self.sc = OAuth2(None, None, from_file='core/api/token.json')
-       self.yahoo_service = YahooFantasyAPIService(self.sc, league_id=self.league_id)
+       
+        self.league_id = settings.LEAGUE_ID
+        self.sc = OAuth2(None, None, from_file='core/api/token.json')
+        self.yahoo_service = YahooFantasyAPIService(self.sc, league_id=self.league_id)
+        self.openrouter_api_key = os.getenv('OPENROUTER_API_KEY', '')
+        self.openrouter_url = "https://openrouter.ai/api/v1/chat/completions"
+        self.openrouter_model = "meta-llama/llama-3.2-3b-instruct"  # Fast, cheap model
+
 
    def execute(self):
        """Main method to update the players endpoint with injury and benefiting player data."""
@@ -180,24 +189,23 @@ class UpdateBenefittingPlayersEndpointUseCase:
        print(injured_players)
 
        return injured_players 
+
    def _get_benefiting_players(self, player):
-       """Finds players who might benefit from an injury based on position and team."""
-       positions = player.positions.split(",")
-       
-       same_team_and_fantasy_points_query = Q(team=player.team) & \
-           Q(fan_pts__lt=player.fan_pts) & \
-           Q(fan_pts__lt=35) & \
-           Q(status='H')
+        """Finds players who might benefit from an injury based on position and team."""
+        positions = player.positions.split(",")
+        same_team_and_fantasy_points_query = Q(team=player.team) & \
+            Q(fan_pts__lt=player.fan_pts) & \
+            Q(fan_pts__lt=35) & \
+            Q(status='H')
+        overlapping_positions_query = Q()
+        for position in positions:
+            overlapping_positions_query |= Q(positions__contains=position)
+        return Player.objects.filter(
+            same_team_and_fantasy_points_query & overlapping_positions_query
+        ).exclude(
+            id=player.id
+        ).order_by("-fan_pts")[0:7]
 
-       overlapping_positions_query = Q()
-       for position in positions:
-           overlapping_positions_query |= Q(positions__contains=position)
-
-       return Player.objects.filter(
-           same_team_and_fantasy_points_query & overlapping_positions_query
-       ).exclude(
-           id=player.id
-       ).order_by("-fan_pts")[0:7]
 
    def _extract_player_stats(self, player):
        """Extracts basic stats for a player."""
@@ -237,36 +245,117 @@ class UpdateBenefittingPlayersEndpointUseCase:
 
        return id_to_owned
 
+
+   def _analyze_benefitting_player(self, injured_player, backup_player):
+        """Use LLM to generate benefitting score and message for a backup player."""
+        if not self.openrouter_api_key:
+            # Fallback if no API key
+            return {
+                'benefitting_score': 50,
+                'message': f"Backup at {backup_player.positions} - likely to see increased minutes."
+            }
+        
+        prompt = f"""Analyze this fantasy basketball injury situation:
+
+INJURED: {injured_player.name}
+- Positions: {injured_player.positions}
+- Stats: {injured_player.fan_pts} fantasy pts/game
+- Status: {injured_player.status}
+
+BACKUP: {backup_player.name}
+- Positions: {backup_player.positions}
+- Stats: {backup_player.fan_pts} fantasy pts/game
+
+Respond ONLY with valid JSON (no markdown):
+{{
+  "benefitting_score": <number 0-100 based on opportunity>,
+  "message": "<1-2 sentences on why to add them>"
+}}"""
+
+        try:
+            response = requests.post(
+                self.openrouter_url,
+                headers={
+                    "Authorization": f"Bearer {self.openrouter_api_key}",
+                    "Content-Type": "application/json",
+                    "HTTP-Referer": "https://yoursite.com",  # Optional but recommended
+                    "X-Title": "Fantasy Basketball Analyzer"  # Optional
+                },
+                json={
+                    "model": self.openrouter_model,
+                    "messages": [
+                        {
+                            "role": "system",
+                            "content": "You are a fantasy basketball analyst. Be concise and actionable."
+                        },
+                        {
+                            "role": "user",
+                            "content": prompt
+                        }
+                    ],
+                    "temperature": 0.3,
+                    "max_tokens": 150
+                },
+                timeout=10
+            )
+            
+            result = response.json()
+            content = result['choices'][0]['message']['content']
+            
+            # Clean up markdown fences if present
+            content = content.replace("```json", "").replace("```", "").strip()
+            analysis = json.loads(content)
+            
+            return {
+                'benefitting_score': analysis.get('benefitting_score', 50),
+                'message': analysis.get('message', 'Potential streaming option.')
+            }
+            
+        except Exception as e:
+            print(f"LLM analysis error for {backup_player.name}: {e}")
+            # Fallback scoring
+            return {
+                'benefitting_score': 50,
+                'message': f"Backup option at {backup_player.positions}."
+            }
+
+    
    def _process_injured_players(self, injured_players):
-       """Processes each injured player and their potential beneficiaries."""
-       injured_players_data = {}
-       
-       for player in injured_players:
-           benefiting_players = self._get_benefiting_players(player)
-           # Build ownership map for both injured and benefiting players in one call
-           yahoo_ids = [int(player.yahoo_id)] + [int(p.yahoo_id) for p in benefiting_players]
-           id_to_owned = self._get_percent_owned_map_by_ids(yahoo_ids)
+        """Processes each injured player and their potential beneficiaries."""
+        injured_players_data = {}
+        
+        for player in injured_players:
+            benefiting_players = self._get_benefiting_players(player)
+            
+            # Build ownership map for both injured and benefiting players in one call
+            yahoo_ids = [int(player.yahoo_id)] + [int(p.yahoo_id) for p in benefiting_players]
+            id_to_owned = self._get_percent_owned_map_by_ids(yahoo_ids)
+            
+            # Build benefiting players detailed data WITH LLM analysis
+            benefiting_players_data = {}
+            for p in benefiting_players:
+                # Get LLM analysis for this backup player
+                llm_analysis = self._analyze_benefitting_player(player, p)
+                
+                benefiting_players_data[p.name] = {
+                    'photo_url': p.photo_url,
+                    'stats': self._extract_player_stats(p),
+                    'percent_owned': id_to_owned.get(int(p.yahoo_id)),
+                    'benefitting_score': llm_analysis['benefitting_score'],
+                    'message': llm_analysis['message']
+                }
+            
+            injured_players_data[player.name] = {
+                'photo_url': player.photo_url,
+                'stats': self._extract_player_stats(player),
+                'percent_owned': id_to_owned.get(int(player.yahoo_id)),
+                'benefiting_players': benefiting_players_data,
+                'time_of_injury': player.time_of_last_update.isoformat(),
+                'status': player.status,
+            }
+        
+        return injured_players_data
 
-           # Build benefiting players detailed data
-           benefiting_players_data = {
-               p.name: {
-                   'photo_url': p.photo_url,
-                   'stats': self._extract_player_stats(p),
-                   'percent_owned': id_to_owned.get(int(p.yahoo_id))
-               }
-               for p in benefiting_players
-           }
-
-           injured_players_data[player.name] = {
-               'photo_url': player.photo_url,
-               'stats': self._extract_player_stats(player),
-               'percent_owned': id_to_owned.get(int(player.yahoo_id)),
-               'benefiting_players': benefiting_players_data,
-               'time_of_injury': player.time_of_last_update.isoformat(),
-               'status': player.status,
-           }
-
-       return injured_players_data
 
    def _save_endpoint(self, injured_players_data):
        """Saves the processed data to the endpoint."""
