@@ -1,6 +1,7 @@
 .env.dev
 .env.prod
 app/core/api/token.json
+nginx/ssl
 package-lock.json
 package.json
 venv

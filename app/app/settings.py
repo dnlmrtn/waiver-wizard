@@ -76,7 +76,7 @@ TEMPLATES = [
     },
 ]
 
-CSRF_TRUSTED_ORIGINS = ['https://waiver.minimaxenergy.com']
+CSRF_TRUSTED_ORIGINS = ["injuredfantasyplayers.com",'https://injuredfantasyplayers.com']
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 STATIC_URL = '/static/'
@@ -147,7 +147,7 @@ CELERY_BROKER_URL = "redis://redis:6379"
 CELERY_RESULT_BACKEND = "redis://redis:6379"
 
 #ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS")
-ALLOWED_HOSTS = ["app", "waiver.minimaxenergy.com", "54.210.158.172"]
+ALLOWED_HOSTS = ["app","https://injuredfantasyplayers.com", "injuredfantasyplayers.com", "54.210.158.172"]
 
 if DEBUG == True:
     CORS_ALLOW_CREDENTIALS = True
@@ -155,6 +155,7 @@ if DEBUG == True:
     CORS_ALLOW_CREDENTIALS = True  # Allow cookies
 
 CORS_ALLOWED_ORIGINS = [
+        "https://injuredfantasyplyaers.com",
     "http://localhost:3000",
 ]
 

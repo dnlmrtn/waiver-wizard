@@ -72,6 +72,8 @@ services:
       - static_volume:/code/app/static
       - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf
       - ./nginx/ssl:/etc/letsencrypt
+      - /etc/letsencrypt:/etc/letsencrypt:ro
+
 
     ports:
       - "80:80"

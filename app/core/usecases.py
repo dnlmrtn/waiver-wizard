@@ -170,12 +170,16 @@ class UpdateBenefittingPlayersEndpointUseCase:
        Endpoint.objects.filter(page='players').delete()
 
    def _get_injured_players(self):
-       """Fetches injured players above fantasy point threshold."""
-       return Player.objects.filter(
+       """
+       Fetches injured players above fantasy point threshold.
+       """
+       injured_players = Player.objects.filter(
            (Q(status='INJ') | Q(status='O')) & 
            Q(fan_pts__gte=25)
        ).order_by("team", "-fan_pts")
+       print(injured_players)
 
+       return injured_players 
    def _get_benefiting_players(self, player):
        """Finds players who might benefit from an injury based on position and team."""
        positions = player.positions.split(",")
@@ -208,12 +212,14 @@ class UpdateBenefittingPlayersEndpointUseCase:
 
    def _get_percent_owned_map_by_ids(self, player_ids):
        """Returns a mapping of yahoo_id -> percent owned (float) for given IDs."""
-       if not player_ids:
-           return {}
+       ownership_list = []
+
        try:
-           ownership_list = self.yahoo_service.get_percent_owned(player_ids)
-       except Exception:
-           ownership_list = []
+           ownership_list = self.yahoo_service.percent_owned(player_ids)
+           print(ownership_list)
+       except:
+           pass
+
 
        id_to_owned = {}
        for entry in ownership_list or []:
@@ -223,18 +229,8 @@ class UpdateBenefittingPlayersEndpointUseCase:
            except ValueError:
                player_id = None
 
-           ownership = entry.get('ownership') or {}
-           percent_value = ownership.get('percent_owned') or ownership.get('ownership_percentage')
-           if isinstance(percent_value, str):
-               percent_value = percent_value.replace('%', '').strip()
-               try:
-                   percent_value = float(percent_value)
-               except ValueError:
-                   percent_value = None
-           elif isinstance(percent_value, (int, float)):
-               percent_value = float(percent_value)
-           else:
-               percent_value = None
+           percent_value = entry.get('percent_owned')
+           percent_value = float(percent_value)
 
            if player_id is not None:
                id_to_owned[player_id] = percent_value
