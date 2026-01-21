@@ -163,6 +163,7 @@ class UpdateBenefittingPlayersEndpointUseCase:
         self.sc = OAuth2(None, None, from_file='core/api/token.json')
         self.yahoo_service = YahooFantasyAPIService(self.sc, league_id=self.league_id)
         self.openrouter_api_key = os.getenv('OPENROUTER_API_KEY', '')
+        print(self.openrouter_api_key)
         self.openrouter_url = "https://openrouter.ai/api/v1/chat/completions"
         self.openrouter_model = "meta-llama/llama-3.2-3b-instruct"  # Fast, cheap model
 
@@ -248,6 +249,7 @@ class UpdateBenefittingPlayersEndpointUseCase:
 
    def _analyze_benefitting_player(self, injured_player, backup_player):
         """Use LLM to generate benefitting score and message for a backup player."""
+
         if not self.openrouter_api_key:
             # Fallback if no API key
             return {
@@ -257,20 +259,20 @@ class UpdateBenefittingPlayersEndpointUseCase:
         
         prompt = f"""Analyze this fantasy basketball injury situation:
 
-INJURED: {injured_player.name}
-- Positions: {injured_player.positions}
-- Stats: {injured_player.fan_pts} fantasy pts/game
-- Status: {injured_player.status}
+        INJURED: {injured_player.name}
+        - Positions: {injured_player.positions}
+        - Stats: {injured_player.fan_pts} fantasy pts/game
+        - Status: {injured_player.status}
 
-BACKUP: {backup_player.name}
-- Positions: {backup_player.positions}
-- Stats: {backup_player.fan_pts} fantasy pts/game
+        BACKUP: {backup_player.name}
+        - Positions: {backup_player.positions}
+        - Stats: {backup_player.fan_pts} fantasy pts/game
 
-Respond ONLY with valid JSON (no markdown):
-{{
-  "benefitting_score": <number 0-100 based on opportunity>,
-  "message": "<1-2 sentences on why to add them>"
-}}"""
+        Respond ONLY with valid JSON (no markdown):
+        {{
+          "benefitting_score": <number 0-100 based on opportunity>,
+          "message": "<1-2 sentences on why to add them>"
+        }}"""
 
         try:
             response = requests.post(
@@ -305,6 +307,12 @@ Respond ONLY with valid JSON (no markdown):
             # Clean up markdown fences if present
             content = content.replace("```json", "").replace("```", "").strip()
             analysis = json.loads(content)
+
+            
+            print({
+                'benefitting_score': analysis.get('benefitting_score', 50),
+                'message': analysis.get('message', 'Potential streaming option.')
+            })
             
             return {
                 'benefitting_score': analysis.get('benefitting_score', 50),
