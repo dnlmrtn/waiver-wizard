@@ -39,9 +39,10 @@ services:
     restart: always
     build:
       context: ./app
+      dockerfile: Dockerfile.celery
     command: [ "celery", "-A", "app", "worker", "--loglevel=info", "-E" ]
     volumes:
-      - ./app:/app
+      - ./app:/app   # If you’re developing and want live code changes
     env_file:
       - .env.prod
     depends_on:

@@ -76,7 +76,7 @@ TEMPLATES = [
     },
 ]
 
-CSRF_TRUSTED_ORIGINS = ["injuredfantasyplayers.com",'https://injuredfantasyplayers.com']
+CSRF_TRUSTED_ORIGINS = ['https://injuredfantasyplayers.com']
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 STATIC_URL = '/static/'
