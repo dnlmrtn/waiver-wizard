@@ -24,6 +24,7 @@ class Player(models.Model):
     steals_per_game = models.FloatField()
     blocks_per_game = models.FloatField()
     to_per_game = models.FloatField()
+    percent_owned = models.IntegerField(default=0)
 
     fan_pts = models.FloatField()
 

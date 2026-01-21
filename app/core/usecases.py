@@ -39,6 +39,7 @@ class UpdatePlayerDataUseCase:
                     'name': player['name']['full'],
                     'headshot_url': player['headshot']['url'],
                     'team': player['editorial_team_abbr'],
+                    'percent_owned': self.yahoo_service.get_percent_owned(player['player_id']),
                     'positions': ", ".join([p['position'] for p in player['eligible_positions'] 
                                             if p['position'] not in ["G", "F", "IL+", "IL", "Util"]])
                     }
@@ -72,7 +73,8 @@ class UpdatePlayerDataUseCase:
                 'name': details['name'],
                 'team': details['team'],
                 'headshot_url': details['headshot_url'],
-                'positions': details['positions']
+                'positions': details['positions'],
+                'percent_owned': details['percent_owned'],
                 }
 
     def _extract_basic_stats(self, player_data):
@@ -119,7 +121,8 @@ class UpdatePlayerDataUseCase:
                     'steals_per_game': stats['st'],
                     'blocks_per_game': stats['blk'],
                     'to_per_game': stats['to'],
-                    'fan_pts': stats['fan_pts']
+                    'fan_pts': stats['fan_pts'],
+                    'percent_owned': details['percent_owned'],
                     }
                 )
 
@@ -164,7 +167,6 @@ class UpdateBenefittingPlayersEndpointUseCase:
         self.sc = OAuth2(None, None, from_file='core/api/token.json')
         self.yahoo_service = YahooFantasyAPIService(self.sc, league_id=self.league_id)
         self.openrouter_api_key = os.getenv('OPENROUTER_API_KEY', '')
-        print(self.openrouter_api_key)
         self.openrouter_url = "https://openrouter.ai/api/v1/chat/completions"
         self.openrouter_model = "meta-llama/llama-3.2-3b-instruct"  # Fast, cheap model
 
